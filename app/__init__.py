@@ -3,7 +3,7 @@ from flask_cors import CORS
 from app.config import Config
 from app.extensions import jwt
 from dotenv import load_dotenv
-from database.connection import get_db_connection
+from app.database.connection import get_db_connection
 
 load_dotenv()  # load once only
 
