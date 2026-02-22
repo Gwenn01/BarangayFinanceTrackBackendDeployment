@@ -1,11 +1,19 @@
-# REMOVE flask_mysqldb completely
-import mysql.connector
-from app.config import Config
+import psycopg2
+import os
+from urllib.parse import urlparse
 
 def get_db_connection():
-    return mysql.connector.connect(
-        host=Config.DB_HOST,
-        user=Config.DB_USER,
-        password=Config.DB_PASSWORD,
-        database=Config.DB_NAME
+    database_url = os.getenv("DATABASE_URL")
+
+    if database_url.startswith("postgres://"):
+        database_url = database_url.replace("postgres://", "postgresql://", 1)
+
+    result = urlparse(database_url)
+
+    return psycopg2.connect(
+        database=result.path[1:],
+        user=result.username,
+        password=result.password,
+        host=result.hostname,
+        port=result.port
     )
