@@ -16,6 +16,8 @@ def log_in():
             return jsonify({"message": "Username and password are required"}), 400
 
         user = get_user_by_username(username)
+        print(user)
+        print(data)
         # validate user
         if not user:
             return jsonify({"message": "Invalid username"}), 401
