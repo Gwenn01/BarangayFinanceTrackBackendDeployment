@@ -10,7 +10,7 @@ def get_db_connection():
 
     result = urlparse(database_url)
 
-    return psycopg2.connect(
+    return psycopg.connect(
         database=result.path[1:],
         user=result.username,
         password=result.password,
