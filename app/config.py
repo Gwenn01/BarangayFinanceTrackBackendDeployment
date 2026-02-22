@@ -7,21 +7,13 @@ class Config:
     FLASK_ENV = os.getenv("FLASK_ENV", "development")
     SECRET_KEY = os.getenv("SECRET_KEY", "fallback-secret")
 
-    # If DATABASE_URL exists (Render), use it
     DATABASE_URL = os.getenv("DATABASE_URL")
 
-    if DATABASE_URL:
-        # Render PostgreSQL
-        SQLALCHEMY_DATABASE_URI = DATABASE_URL
-    else:
-        # Local MySQL
-        DB_HOST = os.getenv("DB_HOST")
-        DB_USER = os.getenv("DB_USER")
-        DB_PASSWORD = os.getenv("DB_PASSWORD")
-        DB_NAME = os.getenv("DB_NAME")
+    if not DATABASE_URL:
+        raise ValueError("DATABASE_URL is not set")
 
-        SQLALCHEMY_DATABASE_URI = (
-            f"mysql+pymysql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
-        )
+    if DATABASE_URL.startswith("postgres://"):
+        DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
+    SQLALCHEMY_DATABASE_URI = DATABASE_URL
     SQLALCHEMY_TRACK_MODIFICATIONS = False
