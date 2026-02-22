@@ -10,8 +10,6 @@ def get_user_by_username(username):
         """
 
         result = fetch_all(query, (username,))
-        print("USERNAME SENT:", username)
-        print("QUERY RESULT:", result)
         return result[0] if result else None
     except Exception as e:
         print(f"Error getting user by username: {e}")
