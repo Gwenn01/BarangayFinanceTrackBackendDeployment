@@ -127,3 +127,5 @@ def get_all_docs_controller():
         return jsonify(docs), 200
     except Exception as e:
         return jsonify({"error": str(e)}), 404
+    
+# activity or history logs ===================
