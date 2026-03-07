@@ -1,11 +1,11 @@
-from app.utils import execute_query
+from app.utils.execute_query  import execute_query, fetch_all
 
 def insert_activity_logs_db(user_id, activity):
 
     query = """
         INSERT INTO activity_logs
         (user_id, username, action, module, description, ip_address, user_agent)
-        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
     """
 
     params = (
@@ -19,3 +19,11 @@ def insert_activity_logs_db(user_id, activity):
     )
 
     execute_query(query, params)
+    
+def get_activity_logs_db():
+
+    query = """
+        SELECT * FROM activity_logs
+    """
+
+    return fetch_all(query)

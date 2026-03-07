@@ -1,7 +1,7 @@
 from flask import request, jsonify
 from app.model.get_user import get_user_by_username
 from app.utils.hash_password import verify_password
-from app.model.general import insert_activity_logs_db
+from app.model.general.activity_logs import insert_activity_logs_db
 
 def log_in():
     try:
