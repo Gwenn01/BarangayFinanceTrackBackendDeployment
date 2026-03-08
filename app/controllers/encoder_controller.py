@@ -85,10 +85,10 @@ def get_budget_entries_controller():
         entries = get_budget_entries_db(year)
 
         if entries:
-            log_activity(data.get("user_id"), data.get("username"), "GET", "Budget Management", f"Budget entries for fiscal year {year} have been successfully retrieved.")
+            #log_activity(data.get("user_id"), data.get("username"), "GET", "Budget Management", f"Budget entries for fiscal year {year} have been successfully retrieved.")
             return jsonify(entries), 200
         else:
-            log_activity(data.get("user_id"), data.get("username"), "GET_FAILED", "Budget Management", f"No budget entries were found for fiscal year {year}. The records may not exist or have been removed.")
+            #log_activity(data.get("user_id"), data.get("username"), "GET_FAILED", "Budget Management", f"No budget entries were found for fiscal year {year}. The records may not exist or have been removed.")
             return jsonify({"message": "No budget entries found for the given year"}), 404
     except Exception as e:
         return jsonify({"message": str(e)}), 500
@@ -160,10 +160,10 @@ def get_disbursement_controller():
         ...
         disbursement = get_disbursement_db()
         if disbursement:
-            log_activity(None, None, "GET", "Disbursement Management", "All disbursement records were successfully retrieved.")
+            #log_activity(None, None, "GET", "Disbursement Management", "All disbursement records were successfully retrieved.")
             return jsonify(disbursement), 200
         else:
-            log_activity(None, None, "GET_FAILED", "Disbursement Management", "Disbursement record retrieval failed. No records were found in the database.")
+            #log_activity(None, None, "GET_FAILED", "Disbursement Management", "Disbursement record retrieval failed. No records were found in the database.")
             return jsonify({"message": "Failed to get disbursement"}), 500
     except Exception as e:
         return jsonify({"message": str(e)}), 500
@@ -231,10 +231,10 @@ def get_collection_controller():
         ...
         collection = get_collection_db()
         if collection:
-            log_activity(None, None, "GET", "Collection Management", "All collection records were successfully retrieved.")
+            #log_activity(None, None, "GET", "Collection Management", "All collection records were successfully retrieved.")
             return jsonify(collection), 200
         else:
-            log_activity(None, None, "GET_FAILED", "Collection Management", "Collection record retrieval failed. No records were found in the database.")
+            #log_activity(None, None, "GET_FAILED", "Collection Management", "Collection record retrieval failed. No records were found in the database.")
             return jsonify({"message": "Failed to get collection"}), 500
     except Exception as e:
         return jsonify({"message": str(e)}), 500
@@ -285,14 +285,14 @@ def get_data_base_range_date_controller():
         print(data)
         if data_name == "collection":
             result = get_data_base_date_collection_db(start_date, end_date)
-            log_activity(data.get("user_id"), data.get("username"), "GET", "Collection Management", f"Collection records for the period {start_date} to {end_date} have been successfully retrieved.")
+            #log_activity(data.get("user_id"), data.get("username"), "GET", "Collection Management", f"Collection records for the period {start_date} to {end_date} have been successfully retrieved.")
             return jsonify({"message": "Successfully retrieved data", "data": result}), 200
         elif data_name == "disbursement":
             result = get_data_base_date_disbursement_db(start_date, end_date)
-            log_activity(data.get("user_id"), data.get("username"), "GET", "Disbursement Management", f"Disbursement records for the period {start_date} to {end_date} have been successfully retrieved.")
+            #log_activity(data.get("user_id"), data.get("username"), "GET", "Disbursement Management", f"Disbursement records for the period {start_date} to {end_date} have been successfully retrieved.")
             return jsonify({"message": "Successfully retrieved data", "data": result}), 200
         else:
-            log_activity(data.get("user_id"), data.get("username"), "GET_FAILED", "Data Range Query", f"Date-range query failed. The specified data type '{data_name}' is not recognized. Please provide a valid data type and try again.")
+            #log_activity(data.get("user_id"), data.get("username"), "GET_FAILED", "Data Range Query", f"Date-range query failed. The specified data type '{data_name}' is not recognized. Please provide a valid data type and try again.")
             return jsonify({"message": "Invalid data name"}), 400
     except Exception as e:
         return jsonify({"message": str(e)}), 500
@@ -353,10 +353,10 @@ def get_dfur_controller():
     try:
         result = get_all_dfur_db()
         if result:
-            log_activity(None, None, "GET", "DFUR Project Management", "All DFUR project records were successfully retrieved.")
+            #log_activity(None, None, "GET", "DFUR Project Management", "All DFUR project records were successfully retrieved.")
             return jsonify({"message": "Successfully retrieved data", "data": result}), 200
         else:
-            log_activity(None, None, "GET_FAILED", "DFUR Project Management", "DFUR project record retrieval failed. No records were found in the database.")
+            #log_activity(None, None, "GET_FAILED", "DFUR Project Management", "DFUR project record retrieval failed. No records were found in the database.")
             return jsonify({"message": "Invalid data name"}), 400
     except Exception as e:
         return jsonify({"message": str(e)}), 500
