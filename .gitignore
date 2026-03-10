@@ -1,0 +1,38 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+ENV/
+
+# Environment variables
+.env
+
+# Flask instance folder
+instance/
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+
+# Mac
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Build files
+build/
+dist/
+*.egg-info/
+
+# Database
+*.sqlite3
+
+# Excel temp files
+~$*.xlsx

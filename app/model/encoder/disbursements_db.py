@@ -42,6 +42,50 @@ def insert_disbursement_db(disbursement):
     except Exception as e:
         print(e)
         return False
+    
+# for bulk
+def insert_disbursement_bulk_db(disbursements):
+    try:
+
+        query = """
+            INSERT INTO disbursements (
+                transaction_id,
+                transaction_date,
+                nature_of_disbursement,
+                description,
+                fund_source,
+                amount,
+                payee,
+                or_number,
+                remarks,
+                created_by,
+                allocation_id
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        params = []
+
+        for disbursement in disbursements:
+            params.append((
+                disbursement["transaction_id"],
+                disbursement["transaction_date"],
+                disbursement.get("nature_of_disbursement"),
+                disbursement.get("description"),
+                disbursement.get("fund_source"),
+                disbursement["amount"],
+                disbursement.get("payee"),
+                disbursement.get("or_number"),
+                disbursement.get("remarks"),
+                disbursement["created_by"],
+                disbursement["allocation_id"]
+            ))
+
+        return execute_query(query, params, many=True)
+
+    except Exception as e:
+        print("Bulk insert disbursement error:", e)
+        return False
 
 def get_disbursement_db():
     try:

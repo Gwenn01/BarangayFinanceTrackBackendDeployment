@@ -38,6 +38,50 @@ def insert_dfur_db(data):
         print("Insert DFRU error:", e)
         return False
 
+# insert bulk data
+def insert_dfur_bulk_db(dfur_list):
+    try:
+
+        query = """
+            INSERT INTO dfur_projects (
+                transaction_id, 
+                transaction_date, 
+                name_of_collection, 
+                project, 
+                location,
+                total_cost_approved,
+                total_cost_incurred,
+                date_started,
+                target_completion_date,
+                status,
+                no_extensions,
+                remarks
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        params = []
+
+        for data in dfur_list:
+            params.append((
+                data['transaction_id'],
+                data['transaction_date'],
+                data['name_of_collection'],
+                data['project'],
+                data['location'],
+                data['total_cost_approved'],
+                data['total_cost_incurred'],
+                data['date_started'],
+                data['target_completion_date'],
+                data['status'],
+                data['no_extensions'],
+                data['remarks']
+            ))
+
+        return execute_query(query, params, many=True)
+
+    except Exception as e:
+        print("Bulk DFUR insert error:", e)
+        return False
 
 def get_all_dfur_db():
     try:

@@ -18,11 +18,15 @@ from app.controllers.encoder_controller import (
     put_dfur_controller,
     delete_dfur_controller,
     generate_transaction_id_controller,
-    generate_11_digit_number_controller
+    generate_11_digit_number_controller,
+    insert_excel_controller
 )
 
 encoder_bp = Blueprint('encoder_bp', __name__)
-
+# insert bulk routes
+@encoder_bp.route('/post-bulk', methods=['POST'])
+def post_bulk():
+    return insert_excel_controller()
 # CRUD ==================================================
 @encoder_bp.route('/post-budget-entries', methods=['POST'])
 def post_budget_entries():

@@ -14,12 +14,21 @@ def fetch_all(query, params=None):
         conn.close()
 
 
-def execute_query(query, params=None):
+def execute_query(query, params=None, many=False):
     conn = get_db_connection()
+    cursor = conn.cursor()
     try:
-        with conn.cursor() as cursor:
+        if many:
+            cursor.executemany(query, params)
+        else:
             cursor.execute(query, params or ())
-            conn.commit()
-            return cursor.rowcount
+
+        conn.commit()
+        return cursor.rowcount
+    except Exception as e:
+        conn.rollback()
+        print("Database error:", e)
+        return 0
     finally:
+        cursor.close()
         conn.close()

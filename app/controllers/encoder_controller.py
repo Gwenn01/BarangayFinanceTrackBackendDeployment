@@ -1,12 +1,17 @@
 from flask import request, jsonify
+import pandas as pd
+import numpy as np
+from datetime import datetime
 from app.model.encoder.budget_entries_db import (
     insert_budget_entries_db,
+    insert_budget_entries_bulk_db,
     get_budget_entries_db,
     put_budget_entries_db,
     delete_budget_entries_db,
 )
 from app.model.encoder.collections_db import (
     insert_collection_db,
+    insert_collection_bulk_db,
     get_collection_db,
     put_collection_db,
     delete_collection_db,
@@ -14,6 +19,7 @@ from app.model.encoder.collections_db import (
 )
 from app.model.encoder.disbursements_db import (
     insert_disbursement_db,
+    insert_disbursement_bulk_db,
     get_disbursement_db,
     put_disbursement_db,
     delete_disbursement_db,
@@ -21,6 +27,7 @@ from app.model.encoder.disbursements_db import (
 )
 from app.model.encoder.dfur_db import(
     insert_dfur_db,
+    insert_dfur_bulk_db,
     get_all_dfur_db,
     put_dfur_db,
     delete_dfur_db
@@ -29,7 +36,82 @@ from app.model.general.activity_logs import insert_activity_logs_db
 from datetime import datetime
 import random
 from flask import request
+# for insert bulk datatypes 
+COLUMN_RULES = {
 
+    "collection": {
+        "required": [
+            "transaction_date",
+            "amount",
+            "created_by"
+        ],
+        "optional_defaults": {
+            "transaction_id" : None,
+            "nature_of_collection": None,
+            "description": None,
+            "fund_source": None,
+            "payor": None,
+            "or_number": None,
+            "remarks": None
+        }
+    },
+
+    "disbursement": {
+        "required": [
+            "transaction_date",
+            "amount",
+            "created_by",
+            "allocation_id"
+        ],
+        "optional_defaults": {
+            "transaction_id": None,
+            "nature_of_disbursement": None,
+            "description": None,
+            "fund_source": None,
+            "payee": None,
+            "or_number": None,
+            "remarks": None
+        }
+    },
+
+    "budget_entries": {
+        "required": [
+            "transaction_date",
+            "category",
+            "amount"
+        ],
+        "optional_defaults": {
+            "transaction_id": None,
+            "subcategory": None,
+            "fund_source": None,
+            "payee": None,
+            "dv_number": None,
+            "expenditure_program": None,
+            "program_description": None,
+            "remarks": None,
+            "allocation_id": None
+        }
+    },
+
+    "dfur": {
+        "required": [
+            "transaction_date",
+            "name_of_collection",
+            "project",
+            "location"
+        ],
+        "optional_defaults": {
+            "transaction_id": None,
+            "total_cost_approved": 0,
+            "total_cost_incurred": 0,
+            "date_started": None,
+            "target_completion_date": None,
+            "status": None,
+            "no_extensions": 0,
+            "remarks": None
+        }
+    }
+}
 # Reserved/non-actual usernames that should fall back to default
 SYSTEM_USERNAMES = {"system", "System", "SYSTEM", None, ""}
 
@@ -375,7 +457,8 @@ def delete_dfur_controller():
     except Exception as e:
         return jsonify({"message": str(e)}), 500
     
-
+# generate the ids
+# auto generated id here ======================
 def generate_transaction_id_controller(prefix, data_type):
     counter = 1
     if data_type == 'collection':
@@ -393,3 +476,80 @@ def generate_transaction_id_controller(prefix, data_type):
 
 def generate_11_digit_number_controller():
     return random.randint(10_000_000_000, 99_999_999_999)
+    
+# BULK inserting blk field ============================================================================================
+def validate_and_prepare_dataframe(df, data_type):
+
+    rules = COLUMN_RULES.get(data_type)
+    if not rules:
+        raise ValueError("Invalid data_type")
+    required = rules["required"]
+    optional = rules["optional_defaults"]
+    # Check missing required columns
+    missing_required = [col for col in required if col not in df.columns]
+    if missing_required:
+        raise ValueError(
+            f"Missing required columns: {', '.join(missing_required)}"
+        )
+    # Add optional columns if missing
+    for col, default in optional.items():
+        if col not in df.columns:
+            df[col] = default
+        else:
+            if default is not None:
+                df[col] = df[col].fillna(default)
+    return df
+
+
+def insert_excel_controller():
+    try:
+
+        file = request.files['file']
+        data_type = request.form.get("data_type")
+        df = pd.read_excel(file)
+        # Validate columns
+        df = validate_and_prepare_dataframe(df, data_type)
+        data = df.to_dict(orient="records")
+
+        PREFIX_MAP = {
+            "collection": "COLL",
+            "budget_entries": "BUDG",
+            "disbursement": "DISB",
+            "dfur": "DFUR"
+        }
+        # Get current count once
+        year = datetime.now().year
+
+        if data_type == "collection":
+            counter = len(get_collection_db())
+
+        elif data_type == "budget_entries":
+            counter = len(get_budget_entries_db(year))
+
+        elif data_type == "disbursement":
+            counter = len(get_disbursement_db())
+
+        elif data_type == "dfur":
+            counter = len(get_all_dfur_db())
+
+        for row in data:
+            if not row.get("transaction_id"):
+                counter += 1
+                row["transaction_id"] = f"{PREFIX_MAP[data_type]}-{year}-{counter:03d}"
+
+            if data_type == "budget_entries" and not row.get("dv_number"):
+                row["dv_number"] = generate_11_digit_number_controller()
+        # Insert to database
+        if data_type == "collection":
+            insert_collection_bulk_db(data)
+        elif data_type == "disbursement":
+            insert_disbursement_bulk_db(data)
+        elif data_type == "budget_entries":
+            created_by = request.form.get("created_by")
+            insert_budget_entries_bulk_db(data, created_by)
+        elif data_type == "dfur":
+            insert_dfur_bulk_db(data)
+
+        return jsonify({"message": "Bulk insert successful"}), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 400

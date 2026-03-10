@@ -1,6 +1,5 @@
 from app.utils.execute_query import execute_query
 from app.utils.execute_query import fetch_all
-
 from app.utils.execute_query import execute_query
 
 def insert_collection_db(collection):
@@ -37,6 +36,47 @@ def insert_collection_db(collection):
         return execute_query(query, params) == 1
     except Exception as e:
         print(f"Error inserting collection: {e}")
+        return False
+    
+# for bulk insert
+def insert_collection_bulk_db(collections):
+    try:
+        query = """
+            INSERT INTO collections (
+                transaction_id,
+                transaction_date,
+                nature_of_collection,
+                description,
+                fund_source,
+                amount,
+                payor,
+                or_number,
+                remarks,
+                created_by
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        params = []
+
+        for collection in collections:
+            params.append((
+                collection["transaction_id"],
+                collection["transaction_date"],
+                collection.get("nature_of_collection"),
+                collection.get("description"),
+                collection.get("fund_source"),
+                collection["amount"],
+                collection.get("payor"),
+                collection.get("or_number"),
+                collection.get("remarks"),
+                collection["created_by"]
+            ))
+
+        return execute_query(query, params, many=True)
+
+    except Exception as e:
+        print(f"Error inserting bulk collections: {e}")
         return False
 
 def get_collection_db():

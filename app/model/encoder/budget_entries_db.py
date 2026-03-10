@@ -43,6 +43,54 @@ def insert_budget_entries_db(entries, created_by):
         print(f"Error inserting budget entries: {e}")
         return False
 
+# insert bulk
+def insert_budget_entries_bulk_db(entries_list, created_by):
+    try:
+
+        query = """
+            INSERT INTO budget_entries (
+                transaction_id,
+                transaction_date,
+                category,
+                subcategory,
+                amount,
+                fund_source,
+                payee,
+                dv_number,
+                expenditure_program,
+                program_description,
+                remarks,
+                allocation_id,
+                created_by
+            )
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        params = []
+
+        for entry in entries_list:
+            params.append((
+                entry["transaction_id"],
+                entry["transaction_date"],
+                entry["category"],
+                entry.get("subcategory"),
+                entry["amount"],
+                entry.get("fund_source"),
+                entry.get("payee"),
+                entry.get("dv_number"),
+                entry.get("expenditure_program"),
+                entry.get("program_description"),
+                entry.get("remarks"),
+                entry.get("allocation_id"),
+                created_by
+            ))
+
+        return execute_query(query, params, many=True)
+
+    except Exception as e:
+        print("Bulk insert budget entries error:", e)
+        return False
+
 
 def get_budget_entries_db(year):
     try:
