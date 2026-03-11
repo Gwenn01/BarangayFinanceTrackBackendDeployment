@@ -5,7 +5,7 @@ def get_comment_db():
     try:
         ...
         query = "SELECT id, name, email, comment FROM viewer_comments"
-        return fetch_all(query, params=None, dictionary=True)
+        return fetch_all(query, params=None)
     except Exception as e:
         ...
         print(e)
