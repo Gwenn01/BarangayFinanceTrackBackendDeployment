@@ -1,68 +1,43 @@
-from app.database.connection import get_db_connection
 from app.utils.execute_query import execute_query
 
-def insert_collection_comment_db(collection_id, reviewed_by, comment):
+TABLE_MAP = {
+    'collections':   'collections',
+    'disbursement': 'disbursements',
+    'dfur':         'dfur_projects',
+}
+
+def insert_flag_comment_db(flagged_by, username, comment, collection_id=None, disbursement_id=None, dfur_project_id=None):
     try:
         query = """
-            UPDATE collections
-            SET
-                is_flagged = True,
-                review_comment = %s,
-                reviewed_by = %s,
-                reviewed_at = NOW()
-            WHERE id = %s
+            INSERT INTO flag_comments (comment_text, flagged_by, collection_id, disbursement_id, dfur_project_id,  username)
+            VALUES (%s, %s, %s, %s, %s, %s)
         """
         params = (
             comment,
-            reviewed_by,
-            collection_id
+            flagged_by,
+            collection_id,
+            disbursement_id,
+            dfur_project_id,
+            username,
         )
         return execute_query(query, params)
 
     except Exception as e:
-        print("Insert comment error:", e)
+        print("Insert flag comment error:", e)
         return False
-    
-def insert_disbursement_comment_db(disbursement_id, reviewed_by, comment):
+
+def put_flagged_db(flag_type, record_id):
     try:
-        query = """
-            UPDATE disbursements SET
-                is_flagged = True,
-                review_comment = %s,
-                reviewed_by = %s,
-                reviewed_at = NOW()
+        table = TABLE_MAP.get(flag_type)
+        if not table:
+            return False
+
+        query = f"""
+            UPDATE {table}
+            SET is_flagged = true
             WHERE id = %s
         """
-        params = (
-            comment,
-            reviewed_by,
-            disbursement_id
-        )
-        return execute_query(query, params)
-
+        return execute_query(query, (record_id,))
     except Exception as e:
-        print("Insert comment error:", e)
+        print(e)
         return False
-
-def insert_dfur_comment_db(dfur_id, reviewed_by, comment):
-    try:
-        query = """
-            UPDATE dfur_projects
-            SET
-                is_flagged = True,
-                review_comment = %s,
-                reviewed_by = %s,
-                reviewed_at = NOW()
-            WHERE id = %s
-        """
-        params = (
-            comment,
-            reviewed_by,
-            dfur_id
-        )
-        return execute_query(query, params)
-
-    except Exception as e:
-        print("Insert comment error:", e)
-        return False
-
