@@ -43,7 +43,6 @@ COLUMN_RULES = {
         "required": [
             "transaction_date",
             "amount",
-            "created_by"
         ],
         "optional_defaults": {
             "transaction_id" : None,
@@ -52,7 +51,8 @@ COLUMN_RULES = {
             "fund_source": None,
             "payor": None,
             "or_number": None,
-            "remarks": None
+            "remarks": None,
+            "created_by": None
         }
     },
 
@@ -60,7 +60,6 @@ COLUMN_RULES = {
         "required": [
             "transaction_date",
             "amount",
-            "created_by",
             "allocation_id"
         ],
         "optional_defaults": {
@@ -70,7 +69,8 @@ COLUMN_RULES = {
             "fund_source": None,
             "payee": None,
             "or_number": None,
-            "remarks": None
+            "remarks": None,
+            "created_by": None,
         }
     },
 
@@ -78,7 +78,7 @@ COLUMN_RULES = {
         "required": [
             "transaction_date",
             "category",
-            "amount"
+            "amount"    
         ],
         "optional_defaults": {
             "transaction_id": None,
@@ -539,6 +539,13 @@ def insert_excel_controller():
 
             if data_type == "budget_entries" and not row.get("dv_number"):
                 row["dv_number"] = generate_11_digit_number_controller()
+            
+            if data_type == "collection" and not row.get("or_number"):
+                row["or_number"] = generate_11_digit_number_controller()
+            
+            if data_type == "disbursement" and not row.get("or_number"):
+                row["or_number"] = generate_11_digit_number_controller()
+                
         # Insert to database
         if data_type == "collection":
             insert_collection_bulk_db(data)
