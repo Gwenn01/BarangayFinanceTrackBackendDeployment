@@ -1,7 +1,7 @@
 from app.utils.execute_query import execute_query
 
 TABLE_MAP = {
-    'collections':   'collections',
+    'collection':   'collections',
     'disbursement': 'disbursements',
     'dfur':         'dfur_projects',
 }

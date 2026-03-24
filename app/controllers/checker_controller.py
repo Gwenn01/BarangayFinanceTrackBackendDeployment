@@ -50,7 +50,7 @@ def insert_flag_comment_controller():
 
         # Step 1: Mark the record as flagged
         flag_success = put_flagged_db(flag_type, record_id)
-
+      
         # Step 2: Insert the comment into flag_comments
         comment_success = insert_flag_comment_db(
             flagged_by=flagged_by,
@@ -58,7 +58,8 @@ def insert_flag_comment_controller():
             comment=comment,
             **{db_kwarg: record_id}
         )
-
+        print("flag_success:", flag_success)
+        print("comment_success:", comment_success)
         if flag_success and comment_success:
             log_activity(data.get('user_id'), username, "INSERT", module,
                          f"A review comment has been successfully submitted for {label} record (ID: {record_id}).")
@@ -69,6 +70,7 @@ def insert_flag_comment_controller():
             return jsonify({'message': 'Failed to insert comment'}), 500
 
     except Exception as e:
+        print(e)
         return jsonify({'message': str(e)}), 500
     
 def get_flag_comments_controller(flag_type, record_id):
