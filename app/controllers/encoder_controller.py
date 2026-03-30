@@ -560,3 +560,21 @@ def insert_excel_controller():
         return jsonify({"message": "Bulk insert successful"}), 200
     except Exception as e:
         return jsonify({"message": str(e)}), 400
+
+
+
+# insert validation docs on the data
+def insert_validation_docs_controller():
+    try:
+        data = request.get_json();
+        data_type = request.form.get("data_type")
+        if data_type == "collections":
+            pass
+        elif data_type == "disbursements":
+            pass
+        elif data_type == "dfur_projects":
+            pass
+        else:
+            return jsonify({"message": "Invalid data type"}), 400
+    except Exception as e:
+        return jsonify({"message": str(e)}), 400
