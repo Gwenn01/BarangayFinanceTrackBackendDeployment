@@ -36,7 +36,7 @@ from app.model.encoder.dfur_db import(
     delete_dfur_db
 ) 
 from app.model.general.activity_logs import insert_activity_logs_db
-from app.model.encoder.upload_validation_docs import update_add_file_path
+from app.model.encoder.upload_validation_docs import update_add_file_path, get_file_path
 from datetime import datetime
 import random
 from flask import request
@@ -595,5 +595,22 @@ def upload_validation_docs_controller(id):
             "file_path": file_path
         }), 200
 
+    except Exception as e:
+        return jsonify({"message": str(e)}), 400
+    
+def get_validation_docs_controller(id, data_type):
+    BASE_URL = "https://barangayfinancetrackbackenddeployment.onrender.com"
+    try:
+        file_path = get_file_path(id, data_type)
+        if not file_path:
+            return jsonify({"message": "No file path found for the given ID and data type"}), 404
+        #  Get filename only
+        filename = os.path.basename(file_path)
+        #  Create public URL
+        file_url = f"{BASE_URL}/api/files/{filename}"
+        return jsonify({
+            "message": "File path retrieved successfully",
+            "file_url": file_url   
+        }), 200
     except Exception as e:
         return jsonify({"message": str(e)}), 400

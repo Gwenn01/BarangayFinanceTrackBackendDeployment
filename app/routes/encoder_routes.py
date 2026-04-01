@@ -1,4 +1,6 @@
 from flask import Blueprint, jsonify, request
+from flask import send_file
+import os
 from app.controllers.encoder_controller import (
     insert_budget_entries_controller,
     get_budget_entries_controller,
@@ -20,7 +22,8 @@ from app.controllers.encoder_controller import (
     generate_transaction_id_controller,
     generate_11_digit_number_controller,
     insert_excel_controller,
-    upload_validation_docs_controller
+    upload_validation_docs_controller,
+    get_validation_docs_controller
 )
 
 encoder_bp = Blueprint('encoder_bp', __name__)
@@ -266,3 +269,20 @@ def get_dfur_generator():
 @encoder_bp.route('/upload-validation-docs/<int:id>', methods=['POST'])
 def upload_validation_docs(id):
     return upload_validation_docs_controller(id)
+
+@encoder_bp.route('/files/<path:filename>', methods=['GET'])
+def serve_file(filename):
+    UPLOAD_FOLDER = "app/validation_docs"
+    try:
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+
+        if not os.path.exists(file_path):
+            return jsonify({"message": "File not found"}), 404
+        
+        return send_file(file_path)
+    except Exception as e:
+        return jsonify({"message": str(e)}), 400
+
+@encoder_bp.route('/get-validation-docs/<int:id>/<string:data_type>', methods=['GET'])
+def get_validation_docs(id, data_type):
+    return get_validation_docs_controller(id, data_type)
