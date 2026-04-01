@@ -272,13 +272,13 @@ def upload_validation_docs(id):
 
 @encoder_bp.route('/files/<path:filename>', methods=['GET'])
 def serve_file(filename):
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    UPLOAD_FOLDER = os.path.join(BASE_DIR, "validation_docs")
     try:
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  
+        UPLOAD_FOLDER = os.path.join(BASE_DIR, "validation_docs")
         file_path = os.path.join(UPLOAD_FOLDER, filename)
+        print("Serving file from:", file_path)  # debug
         if not os.path.exists(file_path):
             return jsonify({"message": "File not found"}), 404
-        
         return send_file(file_path)
     except Exception as e:
         return jsonify({"message": str(e)}), 400

@@ -604,13 +604,11 @@ def get_validation_docs_controller(id, data_type):
         file_path = get_file_path(id, data_type)
         if not file_path:
             return jsonify({"message": "No file path found for the given ID and data type"}), 404
-        #  Get filename only
-        filename = os.path.basename(file_path)
-        #  Create public URL
+        filename = os.path.basename(file_path)  
         file_url = f"{BASE_URL}/api/files/{filename}"
         return jsonify({
             "message": "File path retrieved successfully",
-            "file_url": file_url   
+            "file_url": file_url
         }), 200
     except Exception as e:
         return jsonify({"message": str(e)}), 400
