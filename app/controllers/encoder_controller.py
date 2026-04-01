@@ -1,7 +1,10 @@
-from flask import request, jsonify
 import pandas as pd
 import numpy as np
+import os
 from datetime import datetime
+from werkzeug.utils import secure_filename
+from flask import request, jsonify
+
 from app.model.encoder.budget_entries_db import (
     insert_budget_entries_db,
     insert_budget_entries_bulk_db,
@@ -33,6 +36,7 @@ from app.model.encoder.dfur_db import(
     delete_dfur_db
 ) 
 from app.model.general.activity_logs import insert_activity_logs_db
+from app.model.encoder.upload_validation_docs import update_add_file_path
 from datetime import datetime
 import random
 from flask import request
@@ -561,20 +565,35 @@ def insert_excel_controller():
     except Exception as e:
         return jsonify({"message": str(e)}), 400
 
-
+# =======================================================================================================
+UPLOAD_FOLDER = "app/validation_docs"
 
 # insert validation docs on the data
-def insert_validation_docs_controller():
+def upload_validation_docs_controller(id):
     try:
-        data = request.get_json();
         data_type = request.form.get("data_type")
-        if data_type == "collections":
-            pass
-        elif data_type == "disbursements":
-            pass
-        elif data_type == "dfur_projects":
-            pass
-        else:
-            return jsonify({"message": "Invalid data type"}), 400
+        uploaded_file = request.files.get("file") 
+       
+        print(f"Received file: {uploaded_file} for data type: {data_type} and ID: {id}")
+        if not uploaded_file:
+            return jsonify({"message": "No file uploaded"}), 400
+        # Make filename safe
+        filename = secure_filename(uploaded_file.filename)
+        # Create folder if not exists
+        os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+        # Full path
+        file_path = os.path.join(UPLOAD_FOLDER, filename)
+        # Save file
+        uploaded_file.save(file_path)
+
+        #Save file_path to DB depending on type
+        if not update_add_file_path(id, data_type, file_path):
+            return jsonify({"message": "Failed to update file path in database"}), 400
+
+        return jsonify({
+            "message": "File uploaded successfully",
+            "file_path": file_path
+        }), 200
+
     except Exception as e:
         return jsonify({"message": str(e)}), 400

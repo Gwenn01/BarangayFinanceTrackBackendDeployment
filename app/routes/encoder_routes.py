@@ -19,7 +19,8 @@ from app.controllers.encoder_controller import (
     delete_dfur_controller,
     generate_transaction_id_controller,
     generate_11_digit_number_controller,
-    insert_excel_controller
+    insert_excel_controller,
+    upload_validation_docs_controller
 )
 
 encoder_bp = Blueprint('encoder_bp', __name__)
@@ -259,3 +260,9 @@ def get_dfur_generator():
     data['transaction_id'] = generate_transaction_id_controller('DFUR', 'dfur')
     data['div_number'] = generate_11_digit_number_controller()
     return jsonify(data), 200
+
+# ==========================================================
+# upload validation docs
+@encoder_bp.route('/upload-validation-docs/<int:id>', methods=['POST'])
+def upload_validation_docs(id):
+    return upload_validation_docs_controller(id)
