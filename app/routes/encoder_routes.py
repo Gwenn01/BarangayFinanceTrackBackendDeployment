@@ -23,7 +23,8 @@ from app.controllers.encoder_controller import (
     generate_11_digit_number_controller,
     insert_excel_controller,
     upload_validation_docs_controller,
-    get_validation_docs_controller
+    get_validation_docs_controller,
+    remove_validation_docs_controller
 )
 
 encoder_bp = Blueprint('encoder_bp', __name__)
@@ -286,3 +287,7 @@ def serve_file(filename):
 @encoder_bp.route('/get-validation-docs/<int:id>/<string:data_type>', methods=['GET'])
 def get_validation_docs(id, data_type):
     return get_validation_docs_controller(id, data_type)
+
+@encoder_bp.route("/remove-validation-docs/<id>", methods=["DELETE"])
+def remove_validation_docs(id):
+    return remove_validation_docs_controller(id)

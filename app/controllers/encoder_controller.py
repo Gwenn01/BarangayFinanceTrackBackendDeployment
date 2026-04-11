@@ -614,3 +614,28 @@ def get_validation_docs_controller(id, data_type):
         }), 200
     except Exception as e:
         return jsonify({"message": str(e)}), 400
+    
+def remove_validation_docs_controller(id):
+    try:
+        data_type = request.json.get("data_type")
+
+        if not data_type:
+            return jsonify({"message": "data_type is required"}), 400
+
+        # Get current file path before clearing it
+        file_path = get_file_path(id, data_type)
+
+        # Clear the file path in DB (pass None/null to wipe it)
+        if not update_add_file_path(id, data_type, None):
+            return jsonify({"message": "Failed to remove file path from database"}), 400
+
+        # Delete the actual file from disk if it exists
+        if file_path:
+            clean_path = file_path.replace("\\", "/")
+            if os.path.exists(clean_path):
+                os.remove(clean_path)
+
+        return jsonify({"message": "File removed successfully"}), 200
+
+    except Exception as e:
+        return jsonify({"message": str(e)}), 400
