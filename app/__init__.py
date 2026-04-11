@@ -10,8 +10,11 @@ load_dotenv()  # load once only
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-
-    CORS(app, supports_credentials=True)
+    
+    CORS(app, 
+        supports_credentials=True,
+        origins=["http://localhost:5173", "https://barangayfinancetrackbackenddeployment.onrender.com"]
+    )
 
     jwt.init_app(app)
 
@@ -44,5 +47,6 @@ def create_app():
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT 1")
+        return {"status": "db connected"}
 
     return app
