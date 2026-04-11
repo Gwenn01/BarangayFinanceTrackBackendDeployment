@@ -615,10 +615,8 @@ def get_validation_docs_controller(id, data_type):
     except Exception as e:
         return jsonify({"message": str(e)}), 400
     
-def remove_validation_docs_controller(id):
+def remove_validation_docs_controller(id, data_type):
     try:
-        data_type = request.json.get("data_type")
-
         if not data_type:
             return jsonify({"message": "data_type is required"}), 400
 
