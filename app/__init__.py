@@ -13,7 +13,11 @@ def create_app():
     
     CORS(app, 
         supports_credentials=True,
-        origins=["http://localhost:5173", "https://barangayfinancetrackbackenddeployment.onrender.com"]
+        origins=[
+            "http://localhost:5173",
+            "https://barangay-finance-track.vercel.app",
+            "https://barangayfinancetrackbackenddeployment.onrender.com"
+        ]
     )
 
     jwt.init_app(app)

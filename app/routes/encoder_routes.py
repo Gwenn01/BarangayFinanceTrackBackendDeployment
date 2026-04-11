@@ -288,7 +288,7 @@ def serve_file(filename):
 def get_validation_docs(id, data_type):
     return get_validation_docs_controller(id, data_type)
 
-@encoder_bp.route("/api/delete-validation-docs/<id>/<data_type>", methods=["DELETE", "OPTIONS"])
+@encoder_bp.route("/delete-validation-docs/<id>/<data_type>", methods=["DELETE", "OPTIONS"])
 def remove_validation_docs(id, data_type):
     if request.method == "OPTIONS":
         return "", 200
