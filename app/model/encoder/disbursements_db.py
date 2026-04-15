@@ -58,6 +58,16 @@ def get_file_path_disbursements(id):
     except Exception as e:
         print(e)
         return None
+
+# remove it 
+def remove_file_disbursements(id):
+    try:
+        query = "UPDATE disbursements SET supporting_doc = NULL WHERE id = %s"
+        params = (id,)
+        return execute_query(query, params) == 1
+    except Exception as e:
+        print(e)
+        return False
     
 # for bulk
 def insert_disbursement_bulk_db(disbursements):

@@ -27,7 +27,8 @@ from app.model.encoder.disbursements_db import (
     put_disbursement_db,
     delete_disbursement_db,
     get_data_base_date_disbursement_db,
-    get_file_path_disbursements
+    get_file_path_disbursements,
+    remove_file_disbursements
 )
 from app.model.encoder.dfur_db import(
     insert_dfur_db,
@@ -706,21 +707,19 @@ def get_disbursement_docs_controller(id):
 
 def delete_disbursement_docs_controller(id):
     try:
-        if not os.path.exists(DISBURSEMENT_UPLOAD_FOLDER):
+        #  1. Get file path from DB
+        file_path = get_file_path_disbursements(id)
+
+        if not file_path:
             return jsonify({"message": "No file found for this entry"}), 404
 
-        matched_file = None
-        for fname in os.listdir(DISBURSEMENT_UPLOAD_FOLDER):
-            if fname.startswith(f"{id}_"):
-                matched_file = fname
-                break
+        #  2. Delete file from folder
+        if os.path.exists(file_path['supporting_doc']):
+            os.remove(file_path['supporting_doc'])
 
-        if not matched_file:
-            return jsonify({"message": "No file found for this entry"}), 404
-
-        file_path = os.path.join(DISBURSEMENT_UPLOAD_FOLDER, matched_file)
-        os.remove(file_path)
-
+        if not remove_file_disbursements(id):
+            return jsonify({"message": "Error deleting file from database"}), 500
+      
         return jsonify({"message": "File deleted successfully"}), 200
 
     except Exception as e:

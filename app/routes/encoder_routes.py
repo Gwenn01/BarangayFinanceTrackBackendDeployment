@@ -318,3 +318,9 @@ def serve_disbursement_file(filename):
     print("Serving from:", DISBURSEMENT_UPLOAD_FOLDER)
     print("File requested:", filename)
     return send_from_directory(DISBURSEMENT_UPLOAD_FOLDER, filename)
+
+@encoder_bp.route("/delete-disbursement-docs/<int:id>", methods=["DELETE", "OPTIONS"])
+def delete_disbursement_docs(id):
+    if request.method == "OPTIONS":
+        return "", 200
+    return delete_disbursement_docs_controller(id)
