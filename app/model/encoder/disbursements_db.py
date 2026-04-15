@@ -20,24 +20,24 @@ def insert_disbursement_db(disbursement):
                 remarks,
                 created_by,
                 allocation_id, 
-                supporting_doc,
+                supporting_doc
             )
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         params = (
-           disbursement["transaction_id"],
-           disbursement["transaction_date"],
-           disbursement.get("nature_of_disbursement"),
-           disbursement.get("description"),
-           disbursement.get("fund_source"),
-           disbursement["amount"],
-           disbursement.get("payee"),
-           disbursement.get("or_number"),
-           disbursement.get("remarks"),
-           disbursement["created_by"],
-           disbursement["allocation_id"],
-           disbursement['supporting_doc']
+            disbursement["transaction_id"],
+            disbursement["transaction_date"],
+            disbursement.get("nature_of_disbursement"),
+            disbursement.get("description"),
+            disbursement.get("fund_source"),
+            disbursement["amount"],
+            disbursement.get("payee"),
+            disbursement.get("or_number"),
+            disbursement.get("remarks"),
+            disbursement["created_by"],
+            disbursement["allocation_id"],
+            disbursement.get("supporting_doc")  
         )
 
         return execute_query(query, params) == 1
@@ -46,7 +46,7 @@ def insert_disbursement_db(disbursement):
         return False
     
 # file path
-def get_file_path(id):
+def get_file_path_disbursements(id):
     try:
         query = "SELECT supporting_doc FROM disbursements WHERE id = %s"
         params = (id,)
@@ -129,9 +129,9 @@ def put_disbursement_db(disbursement):
                 payee = %s,
                 or_number = %s,
                 remarks = %s
-            WHERE id = %s
         """
-        params = (
+
+        params = [
             disbursement["transaction_id"],
             disbursement["transaction_date"],
             disbursement.get("nature_of_disbursement"),
@@ -141,19 +141,26 @@ def put_disbursement_db(disbursement):
             disbursement.get("payee"),
             disbursement.get("or_number"),
             disbursement.get("remarks"),
-            disbursement["id"]  # disbursement primary key
-        )
-        
-        return execute_query(query, params) == 1
+        ]
 
+        if disbursement.get("supporting_doc"):
+            query += ", supporting_doc = %s"
+            params.append(disbursement.get("supporting_doc"))
+
+        query += " WHERE id = %s"
+        params.append(disbursement["id"])
+
+        return execute_query(query, tuple(params)) == 1
 
     except Exception as e:
         print("Error updating disbursement:", e)
         return False
+    
 
 def delete_disbursement_db(disbursement_id):
     query = "DELETE FROM disbursements WHERE id = %s"
     return execute_query(query, (disbursement_id,)) == 1
+
 
 def get_data_base_date_disbursement_db(start_date, end_date):
     try:

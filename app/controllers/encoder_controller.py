@@ -26,7 +26,8 @@ from app.model.encoder.disbursements_db import (
     get_disbursement_db,
     put_disbursement_db,
     delete_disbursement_db,
-    get_data_base_date_disbursement_db
+    get_data_base_date_disbursement_db,
+    get_file_path_disbursements
 )
 from app.model.encoder.dfur_db import(
     insert_dfur_db,
@@ -678,25 +679,19 @@ def upload_disbursement_docs_controller():
 
 
 # -------------------- GET --------------------
-
 def get_disbursement_docs_controller(id):
     try:
         BASE_URL = "https://barangayfinancetrackbackenddeployment.onrender.com"
 
-        # Find the file that starts with the entry id
-        if not os.path.exists(DISBURSEMENT_UPLOAD_FOLDER):
+        file_path = get_file_path_disbursements(id)
+
+        if not file_path:
             return jsonify({"message": "No file found for this entry"}), 404
 
-        matched_file = None
-        for fname in os.listdir(DISBURSEMENT_UPLOAD_FOLDER):
-            if fname.startswith(f"{id}_"):
-                matched_file = fname
-                break
+        # Extract filename from stored path
+        filename = os.path.basename(file_path)
 
-        if not matched_file:
-            return jsonify({"message": "No file found for this entry"}), 404
-
-        file_url = f"{BASE_URL}/api/disbursement-files/{matched_file}"
+        file_url = f"{BASE_URL}/api/disbursement-files/{filename}"
 
         return jsonify({
             "message": "File retrieved successfully",
@@ -706,7 +701,6 @@ def get_disbursement_docs_controller(id):
     except Exception as e:
         print(f"Error in get_disbursement_docs_controller: {e}")
         return jsonify({"message": str(e)}), 500
-
 
 # -------------------- DELETE --------------------
 
