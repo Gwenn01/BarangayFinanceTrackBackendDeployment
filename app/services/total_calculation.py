@@ -122,3 +122,44 @@ def result_total_data(data_name, year=None):
     except Exception as e:
         print(e)
         return 0
+    
+def get_variance_data(year=None):
+    try:
+        # ABO (Budget)
+        budget_data = get_budget_entries_db(year)
+        budget_total = sum(item.get("amount", 0) for item in budget_data) if budget_data else 0
+
+        # Collections
+        collections_data = get_collection_db()
+        collections_total = sum(item.get("amount", 0) for item in collections_data) if collections_data else 0
+
+        # Disbursements
+        disbursement_data = get_disbursement_db()
+        disbursement_total = sum(item.get("amount", 0) for item in disbursement_data) if disbursement_data else 0
+
+        # SRE (Actual)
+        actual_total = collections_total - disbursement_total
+
+        # Variance
+        variance = actual_total - budget_total
+
+        # Status
+        if variance > 0:
+            status = "Unfavorable"
+        elif variance < 0:
+            status = "Favorable"
+        else:
+            status = "Balanced"
+
+        return {
+            "budget_total": budget_total,
+            "collections_total": collections_total,
+            "disbursement_total": disbursement_total,
+            "actual_total": actual_total,
+            "variance": variance,
+            "status": status
+        }
+
+    except Exception as e:
+        print(e)
+        return {}

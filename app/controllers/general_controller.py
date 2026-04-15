@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from app.services.total_calculation import result_total_data
+from app.services.total_calculation import result_total_data, get_variance_data
 
 #CALCULATIONS===========================================+
 def get_total_data_budget_allocation_controller():
@@ -36,5 +36,18 @@ def get_total_data_dfur_controller():
         ...
         total_data = result_total_data("dfur_projects")
         return jsonify(total_data), 200
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+    
+def get_variance_data_controller():
+    try:
+        year = 2026
+        data = get_variance_data(year)
+
+        return jsonify({
+            "message": "Variance computed successfully",
+            "data": data
+        }), 200
+
     except Exception as e:
         return jsonify({"message": str(e)}), 500
