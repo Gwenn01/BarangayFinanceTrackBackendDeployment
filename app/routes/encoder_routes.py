@@ -1,6 +1,7 @@
 from flask import Blueprint, jsonify, request
 from flask import send_file
 import os
+from flask import send_from_directory
 from app.controllers.encoder_controller import (
     insert_budget_entries_controller,
     get_budget_entries_controller,
@@ -309,3 +310,11 @@ def get_disbursement_docs(id):
         return "", 200
     return get_disbursement_docs_controller(id)
 
+# view the path
+DISBURSEMENT_UPLOAD_FOLDER = os.path.join(os.getcwd(), "app", "disbursement-docs")
+
+@encoder_bp.route("/disbursement-files/<filename>", methods=["GET"])
+def serve_disbursement_file(filename):
+    print("Serving from:", DISBURSEMENT_UPLOAD_FOLDER)
+    print("File requested:", filename)
+    return send_from_directory(DISBURSEMENT_UPLOAD_FOLDER, filename)

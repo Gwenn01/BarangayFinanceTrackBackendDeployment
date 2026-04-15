@@ -681,15 +681,15 @@ def upload_disbursement_docs_controller():
 # -------------------- GET --------------------
 def get_disbursement_docs_controller(id):
     try:
-        BASE_URL = "https://barangayfinancetrackbackenddeployment.onrender.com"
-
+        #BASE_URL = "https://barangayfinancetrackbackenddeployment.onrender.com"
+        BASE_URL = "http://127.0.0.1:5000"
         file_path = get_file_path_disbursements(id)
 
         if not file_path:
             return jsonify({"message": "No file found for this entry"}), 404
 
         # Extract filename from stored path
-        filename = os.path.basename(file_path)
+        filename = os.path.basename(file_path['supporting_doc'])
 
         file_url = f"{BASE_URL}/api/disbursement-files/{filename}"
 

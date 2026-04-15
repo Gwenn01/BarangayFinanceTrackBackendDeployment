@@ -50,9 +50,9 @@ def get_file_path_disbursements(id):
     try:
         query = "SELECT supporting_doc FROM disbursements WHERE id = %s"
         params = (id,)
-        result = execute_query(query, params)
+        result = fetch_all(query, params)
         if result:
-            return result[0][0]
+            return result[0]
         else:
             return None         
     except Exception as e:
