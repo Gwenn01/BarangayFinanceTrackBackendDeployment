@@ -637,3 +637,98 @@ def remove_validation_docs_controller(id, data_type):
 
     except Exception as e:
         return jsonify({"message": str(e)}), 400
+
+# DISBURSEMENT ============================================================================
+# upload the temp docs
+DISBURSEMENT_UPLOAD_FOLDER = "app/disbursement-docs"
+
+# -------------------- UPLOAD --------------------
+def upload_disbursement_docs_controller():
+    try:
+        if 'file' not in request.files:
+            return jsonify({"message": "No file part"}), 400
+
+        file = request.files['file']
+
+        if file.filename == "":
+            return jsonify({"message": "No file selected"}), 400
+
+        filename = secure_filename(file.filename)
+
+        # Create folder if not exists
+        os.makedirs(DISBURSEMENT_UPLOAD_FOLDER, exist_ok=True)
+
+        # Save with entry id prefix to keep files unique per row
+        unique_filename = f"{filename}"
+        file_path = os.path.join(DISBURSEMENT_UPLOAD_FOLDER, unique_filename)
+        file.save(file_path)
+
+        BASE_URL = "https://barangayfinancetrackbackenddeployment.onrender.com"
+        file_url = f"{BASE_URL}/api/disbursement-files/{unique_filename}"
+
+        return jsonify({
+            "message": "File uploaded successfully",
+            "file_url": file_url,
+            "file_path": file_path
+        }), 200
+
+    except Exception as e:
+        print(f"Error in upload_disbursement_docs_controller: {e}")
+        return jsonify({"message": str(e)}), 500
+
+
+# -------------------- GET --------------------
+
+def get_disbursement_docs_controller(id):
+    try:
+        BASE_URL = "https://barangayfinancetrackbackenddeployment.onrender.com"
+
+        # Find the file that starts with the entry id
+        if not os.path.exists(DISBURSEMENT_UPLOAD_FOLDER):
+            return jsonify({"message": "No file found for this entry"}), 404
+
+        matched_file = None
+        for fname in os.listdir(DISBURSEMENT_UPLOAD_FOLDER):
+            if fname.startswith(f"{id}_"):
+                matched_file = fname
+                break
+
+        if not matched_file:
+            return jsonify({"message": "No file found for this entry"}), 404
+
+        file_url = f"{BASE_URL}/api/disbursement-files/{matched_file}"
+
+        return jsonify({
+            "message": "File retrieved successfully",
+            "file_url": file_url
+        }), 200
+
+    except Exception as e:
+        print(f"Error in get_disbursement_docs_controller: {e}")
+        return jsonify({"message": str(e)}), 500
+
+
+# -------------------- DELETE --------------------
+
+def delete_disbursement_docs_controller(id):
+    try:
+        if not os.path.exists(DISBURSEMENT_UPLOAD_FOLDER):
+            return jsonify({"message": "No file found for this entry"}), 404
+
+        matched_file = None
+        for fname in os.listdir(DISBURSEMENT_UPLOAD_FOLDER):
+            if fname.startswith(f"{id}_"):
+                matched_file = fname
+                break
+
+        if not matched_file:
+            return jsonify({"message": "No file found for this entry"}), 404
+
+        file_path = os.path.join(DISBURSEMENT_UPLOAD_FOLDER, matched_file)
+        os.remove(file_path)
+
+        return jsonify({"message": "File deleted successfully"}), 200
+
+    except Exception as e:
+        print(f"Error in delete_disbursement_docs_controller: {e}")
+        return jsonify({"message": str(e)}), 500

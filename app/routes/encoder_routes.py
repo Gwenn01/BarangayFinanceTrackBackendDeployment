@@ -24,7 +24,8 @@ from app.controllers.encoder_controller import (
     insert_excel_controller,
     upload_validation_docs_controller,
     get_validation_docs_controller,
-    remove_validation_docs_controller
+    remove_validation_docs_controller,
+    upload_disbursement_docs_controller
 )
 
 encoder_bp = Blueprint('encoder_bp', __name__)
@@ -293,3 +294,9 @@ def remove_validation_docs(id, data_type):
     if request.method == "OPTIONS":
         return "", 200
     return remove_validation_docs_controller(id, data_type)
+
+@encoder_bp.route("/upload-disbursement-docs", methods=["POST", "OPTIONS"])
+def upload_disbursement_docs():
+    if request.method == "OPTIONS":
+        return "", 200
+    return upload_disbursement_docs_controller()

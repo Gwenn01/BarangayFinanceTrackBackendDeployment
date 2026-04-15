@@ -19,9 +19,10 @@ def insert_disbursement_db(disbursement):
                 or_number,
                 remarks,
                 created_by,
-                allocation_id  
+                allocation_id, 
+                supporting_doc,
             )
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         params = (
@@ -35,13 +36,28 @@ def insert_disbursement_db(disbursement):
            disbursement.get("or_number"),
            disbursement.get("remarks"),
            disbursement["created_by"],
-           disbursement["allocation_id"]
+           disbursement["allocation_id"],
+           disbursement['supporting_doc']
         )
 
         return execute_query(query, params) == 1
     except Exception as e:
         print(e)
         return False
+    
+# file path
+def get_file_path(id):
+    try:
+        query = "SELECT supporting_doc FROM disbursements WHERE id = %s"
+        params = (id,)
+        result = execute_query(query, params)
+        if result:
+            return result[0][0]
+        else:
+            return None         
+    except Exception as e:
+        print(e)
+        return None
     
 # for bulk
 def insert_disbursement_bulk_db(disbursements):
