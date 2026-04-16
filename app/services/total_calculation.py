@@ -105,6 +105,13 @@ def get_source_type(nature):
         if nature in items:
             return category
     return "Other"
+
+def get_disbursement_category(nature):
+    for category, data in DISBURSEMENT_CATEGORIES.items():
+        for sub_list in data["subcategories"].values():
+            if nature in sub_list:
+                return category
+    return "Other"
 # result data =============================================================================================================    
 def result_total_data(data_name, year=None):
     try:
@@ -223,3 +230,154 @@ def compute_collection_summary():
         })
 
     return result
+
+DISBURSEMENT_CATEGORIES = {
+    "A. Personal Services": {
+        "label": "A. Personal Services",
+        "subcategories": {
+            "Personal Services": [
+                "Honoraria",
+                "Cash gift",
+                "Mid year bonus",
+                "Year end bonus",
+                "Productivity Enhancement Incentive (PEI)",
+                "Annual leave benefits",
+            ],
+        },
+    },
+    "B. Maintenance and Other Operating Expenses (MOOE)": {
+        "label": "B. Maintenance and Other Operating Expenses (MOOE)",
+        "subcategories": {
+            "Operating Expenses": [
+                "Traveling Expenses",
+                "Training Expenses",
+                "Office Supplies Expenses",
+                "Accountable Forms Expenses",
+                "Electricity Expenses",
+                "Auditing Services",
+                "Bookkeeping Services",
+                "Fuel, Oil, and Lubricants",
+                "Other supplies and materials expenses",
+                "Drugs and Medicines expenses",
+                "Uniforms and Clothing Expenses",
+                "Representation Expense",
+                "Fidelity Bond Premiums",
+                "Repairs and Maintenance- Building and Other Structures Maintenance and Repair Expenses",
+                "Transportation Equipment",
+                "Other Professional Services",
+                "Other Personal services",
+                "Other General Services",
+                "Janitorial Services",
+                "Waste Segregation Management",
+                "Insurance Premium",
+                "Discretionary Fund",
+                "Membership Dues and Contributions to Organizations",
+                "Donations",
+                "Other MOOE",
+            ],
+        },
+    },
+    "C. Capital Outlay": {
+        "label": "C. Capital Outlay",
+        "subcategories": {
+            "Capital Expenditures": [
+                "Land Improvements",
+                "Infrastructure Assets- Buildings and Other Structures",
+                "Machinery and Equipment",
+                "Transportation Equipment",
+                "Furniture, Fixtures and Books",
+                "Other P.P.E",
+            ],
+        },
+    },
+    "D. Special Purpose Appropriations (SPA)": {
+        "label": "D. Special Purpose Appropriations (SPA)",
+        "subcategories": {
+            "Special Appropriations": [
+                "Appropriation for SK",
+                "Other Authorized SPAs",
+            ],
+        },
+    },
+    "E. Basic Services and Facilities Program - SOCIAL SERVICES": {
+        "label": "E. Basic Services and Facilities Program - SOCIAL SERVICES",
+        "subcategories": {
+            "Day Care Services": [
+                "Subsidy to Day Care Worker",
+            ],
+            "Health and Nutrition Services": [
+                "Subsidy to BHWs and Brgy, Nutrition Scholars",
+            ],
+            "Peace and Order Services": [
+                "Subsidy to BPATS",
+            ],
+            "Katarungang Pambarangay Services": [
+                "Subsidy to Lupon Members",
+            ],
+        },
+    },
+    "F. Infrastructure Projects - 20% Development Fund - ECONOMIC SERVICES": {
+        "label": "F. Infrastructure Projects - ECONOMIC SERVICES",
+        "subcategories": {
+            "Infrastructure Development": [
+                "Rehabilitation/Repair of Barangay Jail",
+                "Construction Extension shed of Brgy. Covered Court",
+                "Construction/Extension of Barangay Shed or Hall",
+                "Construction of Kitchen & Stock Room",
+                "Improvement of Rooftop",
+                "Construction of Welcome Signage",
+                "Construction of Canals",
+                "Installation of CCTV Cameras",
+                "Repair of Barangay Hall, Covered Court, & Fence",
+                "Fabrication & Repair of Signages",
+            ],
+        },
+    },
+    "G. Other Services": {
+        "label": "G. Other Services",
+        "subcategories": {
+            "Quick Response Fund (QRF) Activities": [
+                "Purchase of food commodities",
+                "Disaster Preparedness, Prevention and Mitigation Response Rehabilitation and Recovery",
+                "Purchased of expandable items",
+                "Declogging and Dredging of Canals",
+                "Tree and Bushes pruning",
+                "Conducting fire and Earthquake Drill",
+            ],
+            "Other Community Services": [
+                "Senior Citizen/PWDs Services",
+                "BCPC",
+                "Others",
+            ],
+        },
+    },
+}
+
+# =========================
+# DISBURSEMENT SUMMARY
+# =========================
+def compute_disbursement_summary():
+    totals = defaultdict(float)
+
+    disbursements = handle_data('disbursements', 2026)
+
+    for row in disbursements:
+        nature = row.get("nature_of_disbursement", "")
+        amount = float(row.get("amount", 0))
+
+        category = get_disbursement_category(nature)
+        totals[category] += amount
+
+    grand_total = sum(totals.values())
+
+    result = []
+    for category, total in totals.items():
+        percentage = (total / grand_total * 100) if grand_total > 0 else 0
+
+        result.append({
+            "category": category,
+            "total": round(total, 2),
+            "percentage": round(percentage, 2)
+        })
+
+    return sorted(result, key=lambda x: x["category"])
