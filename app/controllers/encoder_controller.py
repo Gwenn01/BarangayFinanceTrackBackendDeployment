@@ -692,7 +692,7 @@ def get_disbursement_docs_controller(id):
         # Extract filename from stored path
         filename = os.path.basename(file_path['supporting_doc'])
 
-        file_url = f"{BASE_URL}/api/disbursement-docs/{filename}"
+        file_url = f"{BASE_URL}/api/disbursement-files/{filename}"
 
         return jsonify({
             "message": "File retrieved successfully",
