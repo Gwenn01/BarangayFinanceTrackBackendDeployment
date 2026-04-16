@@ -1,4 +1,5 @@
-from app.services.total_calculation import result_total_data
+from app.services.total_calculation import result_total_data, compute_collection_summary
+
 def run_tests():
     #print(get_users("superadmin", "admin123"))
     # print(get_all_users())
@@ -11,4 +12,5 @@ def run_tests():
     # print(total_active_projects())
     
     # print(result_total_data("disbursements"))
+    #print(compute_collection_summary)
     print("Running tests...")

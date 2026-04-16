@@ -2,7 +2,9 @@ from app.model.encoder.budget_entries_db import get_budget_entries_db
 from app.model.encoder.dfur_db import get_all_dfur_db
 from app.model.encoder.disbursements_db import get_disbursement_db
 from app.model.encoder.collections_db import get_collection_db
+from collections import defaultdict
 
+# sub functions ============================================================================================
 def handle_data(data_name, year):
     try:
         if data_name == "budget_entries":
@@ -98,6 +100,12 @@ def total_flagged(data):
         print(e)
         return 0
     
+def get_source_type(nature):
+    for category, items in COLLECTION_MAPPING.items():
+        if nature in items:
+            return category
+    return "Other"
+# result data =============================================================================================================    
 def result_total_data(data_name, year=None):
     try:
         ...
@@ -122,7 +130,7 @@ def result_total_data(data_name, year=None):
     except Exception as e:
         print(e)
         return 0
-    
+ # variance for encoder dashboard ====================================================================================   
 def get_variance_data(year=None):
     try:
         # ABO (Budget)
@@ -163,3 +171,56 @@ def get_variance_data(year=None):
     except Exception as e:
         print(e)
         return {}
+
+# revenue and expenditure sources ================================================================================================
+COLLECTION_MAPPING = {
+    "External": [
+        "Share from Real Property Tax",
+        "Tax on Sand, Gravel & Other Quarry Resources",
+        "Other Taxes (Community Tax / CTC)",
+        "Internal Revenue Allotment (IRA) / National Tax Allotment (NTA)",
+        "Share from National Wealth",
+        "Tobacco Excise Tax (RA 7171 / 8240)",
+        "Subsidy from LGUs",
+        "Subsidy from National Government"
+    ],
+    "Internal": [
+        "Clearance and Certification Fees",
+        "Barangay Clearance Fees",
+        "Barangay Business Clearance",
+        "Barangay Residency",
+        "K.P. Filing fees",
+        "Other Service Income"
+    ],
+    "Non-Income": [
+        "Refunds / Reimbursements",
+        "Sale of Property or Equipment",
+        "Interest Income / Dividend",
+        "Loans / Borrowings Proceeds",
+        "Fund raising proceeds for specific/ temporary purpose"
+    ]
+}
+
+def compute_collection_summary():
+    totals = defaultdict(float)
+    collections = handle_data(collections, 2026)
+    # Step 1: classify + sum
+    for row in collections:
+        source_type = get_source_type(row["nature_of_collection"])
+        print(source_type)
+        totals[source_type] += float(row["amount"])
+
+    # Step 2: grand total
+    grand_total = sum(totals.values())
+
+    # Step 3: compute percentage
+    result = []
+    for category, total in totals.items():
+        percentage = (total / grand_total * 100) if grand_total > 0 else 0
+        result.append({
+            "category": category,
+            "total": total,
+            "percentage": round(percentage, 2)
+        })
+
+    return result
