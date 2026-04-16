@@ -1,6 +1,9 @@
 from flask import request, jsonify
-from app.services.total_calculation import result_total_data, get_variance_data
-
+from app.services.total_calculation import (
+    result_total_data, 
+    get_variance_data, 
+    compute_collection_summary
+)
 #CALCULATIONS===========================================+
 def get_total_data_budget_allocation_controller():
     try:
@@ -49,5 +52,16 @@ def get_variance_data_controller():
             "data": data
         }), 200
 
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+    
+def get_collection_summary_controller():
+    try:
+        ...
+        data = compute_collection_summary()
+        return jsonify({
+            "message": "Revenue sources computed successfully",
+            "data": data
+        }), 200
     except Exception as e:
         return jsonify({"message": str(e)}), 500

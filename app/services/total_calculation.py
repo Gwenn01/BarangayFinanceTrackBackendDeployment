@@ -203,11 +203,10 @@ COLLECTION_MAPPING = {
 
 def compute_collection_summary():
     totals = defaultdict(float)
-    collections = handle_data(collections, 2026)
+    collections = handle_data('collections', 2026)
     # Step 1: classify + sum
     for row in collections:
         source_type = get_source_type(row["nature_of_collection"])
-        print(source_type)
         totals[source_type] += float(row["amount"])
 
     # Step 2: grand total

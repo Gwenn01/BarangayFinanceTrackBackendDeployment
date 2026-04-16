@@ -12,5 +12,8 @@ def run_tests():
     # print(total_active_projects())
     
     # print(result_total_data("disbursements"))
-    #print(compute_collection_summary)
+    #print(compute_collection_summary())
     print("Running tests...")
+    
+if __name__ == "__main__":
+    run_tests()

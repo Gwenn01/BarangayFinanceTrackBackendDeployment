@@ -4,7 +4,8 @@ from app.controllers.general_controller import (
     get_total_data_collection_controller,
     get_total_data_disbursement_controller,
     get_total_data_dfur_controller,
-    get_variance_data_controller
+    get_variance_data_controller,
+    get_collection_summary_controller
 )
 
 general_bp = Blueprint("general_bp", __name__)
@@ -31,3 +32,7 @@ def total_data_dfur_project():
 @general_bp.route('/get-variance-data', methods=['GET'])
 def get_variance_data():
     return get_variance_data_controller()
+
+@general_bp.route('/get-collection-summary', methods=['GET'])
+def get_collection_summary():
+    return get_collection_summary_controller()
