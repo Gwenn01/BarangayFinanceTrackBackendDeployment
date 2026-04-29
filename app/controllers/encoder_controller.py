@@ -466,19 +466,35 @@ def delete_dfur_controller():
 # generate the ids
 # auto generated id here ======================
 def generate_transaction_id_controller(prefix, data_type):
-    counter = 1
-    if data_type == 'collection':
-        counter = len(get_collection_db())
-    elif data_type == 'budget_entries':
-        counter = len(get_budget_entries_db(datetime.now().year))
-    elif data_type == 'disbursement':
-        counter = len(get_disbursement_db())
-    elif data_type == 'dfur':
-        counter = len(get_all_dfur_db())
-    counter += 1
-    
     year = datetime.now().year
-    return f"{prefix}-{year}-{counter:03d}"
+
+    if data_type == 'collection':
+        entries = get_collection_db()
+        prefix_key = f"COLL-{year}-"
+    elif data_type == 'budget_entries':
+        entries = get_budget_entries_db(year)
+        prefix_key = f"BUDG-{year}-"
+    elif data_type == 'disbursement':
+        entries = get_disbursement_db()
+        prefix_key = f"DISB-{year}-"
+    elif data_type == 'dfur':
+        entries = get_all_dfur_db()
+        prefix_key = f"DFUR-{year}-"
+    else:
+        return f"{prefix}-{year}-001"
+
+    max_counter = 0
+    for entry in entries:
+        tid = entry.get("transaction_id", "") or ""
+        if tid.startswith(prefix_key):
+            try:
+                num = int(tid.split("-")[-1])
+                if num > max_counter:
+                    max_counter = num
+            except ValueError:
+                continue
+
+    return f"{prefix}-{year}-{(max_counter + 1):03d}"
 
 def generate_11_digit_number_controller():
     return random.randint(10_000_000_000, 99_999_999_999)
